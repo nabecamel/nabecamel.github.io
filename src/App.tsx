@@ -16,79 +16,108 @@ function useReveal<T extends HTMLElement>() {
   return ref;
 }
 
-// ── Graffiti section heading ─────────────────────────────────────────
-function GrafHeading({ children }: { children: React.ReactNode }) {
+// ── Wave divider ─────────────────────────────────────────────────────
+function WaveDown({ fill }: { fill: string }) {
+  return (
+    <svg
+      viewBox="0 0 1440 56"
+      preserveAspectRatio="none"
+      style={{ display: "block", width: "100%", height: 56, fill }}
+    >
+      <path d="M0,20 C360,56 1080,0 1440,28 L1440,56 L0,56 Z" />
+    </svg>
+  );
+}
+function WaveUp({ fill }: { fill: string }) {
+  return (
+    <svg
+      viewBox="0 0 1440 56"
+      preserveAspectRatio="none"
+      style={{ display: "block", width: "100%", height: 56, fill }}
+    >
+      <path d="M0,36 C360,0 1080,56 1440,20 L1440,0 L0,0 Z" />
+    </svg>
+  );
+}
+
+// ── Section heading ──────────────────────────────────────────────────
+function SectionHeading({
+  children,
+  accent = "#2A9BD5",
+}: {
+  children: React.ReactNode;
+  accent?: string;
+}) {
   const ref = useReveal<HTMLDivElement>();
   return (
     <div ref={ref} className="reveal text-center mb-14">
-      <h2 className="font-bebas text-6xl md:text-7xl text-white" style={{ letterSpacing: "0.06em" }}>
+      <h2 className="text-4xl md:text-5xl font-extrabold text-[#0F3D5C]">
         {children}
       </h2>
-      {/* paint stroke bar */}
-      <div className="flex justify-center gap-1 mt-3">
-        <div className="h-[3px] w-10 bg-[#FFE600]" />
-        <div className="h-[3px] w-4  bg-[#FF2D78]" />
-        <div className="h-[3px] w-7  bg-[#00C2FF]" />
-      </div>
+      <div
+        className="mx-auto mt-3 h-1.5 w-12 rounded-full"
+        style={{ background: accent }}
+      />
     </div>
   );
 }
 
 // ── Data ─────────────────────────────────────────────────────────────
 const NAV = [
-  { href: "#about",    label: "ABOUT"    },
-  { href: "#projects", label: "PROJECTS" },
-  { href: "#skills",   label: "SKILLS"   },
-  { href: "#contact",  label: "CONTACT"  },
+  { href: "#about",    label: "About"    },
+  { href: "#projects", label: "Projects" },
+  { href: "#skills",   label: "Skills"   },
+  { href: "#contact",  label: "Contact"  },
 ];
 
 const PROJECTS = [
   {
-    label:       "PROJECT_01",
     title:       "E2Eテスト自動化ツール",
     description: "Railway上でGPT-4oとPlaywrightを組み合わせたE2Eテスト自動化ツール。SlackやDiscordへの通知機能も実装した副業案件。",
     tags:        ["Playwright", "GPT-4o", "Railway", "Slack API"],
-    accent:      "#FFE600",
+    icon:        "🤖",
+    accent:      "#2A9BD5",
+    paleBg:      "#EBF6FD",
   },
   {
-    label:       "PROJECT_02",
     title:       "ポートフォリオサイト",
     description: "React + TypeScript + Tailwind CSS で構築した個人ポートフォリオ。GitHub Actions による自動デプロイを運用中。",
     tags:        ["React", "TypeScript", "Tailwind CSS", "GitHub Pages"],
-    accent:      "#FF2D78",
+    icon:        "🌊",
+    accent:      "#38B89A",
+    paleBg:      "#E8FAF5",
   },
 ];
 
 const SKILLS = [
   {
-    label:  "FRONTEND",
-    color:  "#00C2FF",
+    label: "Frontend",
+    accent: "#2A9BD5",
+    pale:   "#EBF6FD",
     items:  ["React", "TypeScript", "JavaScript", "HTML", "CSS", "Tailwind CSS"],
   },
   {
-    label:  "BACKEND / DB",
-    color:  "#39FF14",
+    label: "Backend / DB",
+    accent: "#38B89A",
+    pale:   "#E8FAF5",
     items:  ["Spring Boot", "Supabase", "REST API"],
   },
   {
-    label:  "TOOLS / INFRA",
-    color:  "#FF2D78",
+    label: "Tools / Infra",
+    accent: "#5AABDF",
+    pale:   "#EEF8FF",
     items:  ["Playwright", "Railway", "Git", "GitHub Actions"],
   },
 ];
 
-// ── Noise texture (concrete wall feel) ───────────────────────────────
-const NOISE_BG = {
-  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
-  backgroundSize: "200px 200px",
-} as React.CSSProperties;
-
 // ── App ──────────────────────────────────────────────────────────────
 export default function App() {
-  const [active, setActive] = useState("hero");
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive]     = useState("hero");
 
   useEffect(() => {
     const onScroll = () => {
+      setScrolled(window.scrollY > 30);
       const ids = ["contact", "skills", "projects", "about", "hero"];
       for (const id of ids) {
         const el = document.getElementById(id);
@@ -100,12 +129,21 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] text-white">
+    <div className="min-h-screen" style={{ background: "#FAFCFF" }}>
 
       {/* ── Nav ── */}
-      <header className="fixed top-0 w-full z-50 bg-[#0d0d0d]/95 backdrop-blur-sm border-b border-white/5">
+      <header
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-white/90 backdrop-blur-md shadow-sm"
+            : "bg-transparent"
+        }`}
+      >
         <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="#hero" className="font-marker text-2xl text-[#FFE600]">
+          <a
+            href="#hero"
+            className="text-2xl font-black text-[#2A9BD5]"
+          >
             nabecamel
           </a>
           <ul className="flex gap-8 list-none">
@@ -113,12 +151,18 @@ export default function App() {
               <li key={href}>
                 <a
                   href={href}
-                  className={`font-bebas text-sm transition-colors ${
-                    active === href.slice(1) ? "text-[#FFE600]" : "text-gray-500 hover:text-[#FFE600]"
+                  className={`font-semibold text-sm transition-colors relative group ${
+                    active === href.slice(1)
+                      ? "text-[#2A9BD5]"
+                      : "text-[#3A6478] hover:text-[#2A9BD5]"
                   }`}
-                  style={{ letterSpacing: "0.18em" }}
                 >
                   {label}
+                  <span
+                    className={`absolute -bottom-0.5 left-0 h-0.5 rounded-full bg-[#2A9BD5] transition-all duration-300 ${
+                      active === href.slice(1) ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
                 </a>
               </li>
             ))}
@@ -129,151 +173,156 @@ export default function App() {
       {/* ── Hero ── */}
       <section
         id="hero"
-        className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden bg-[#0d0d0d]"
+        className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(150deg, #D6EEFB 0%, #E8F8F3 40%, #F5FCFF 80%, #FAFEFF 100%)",
+        }}
       >
-        {/* concrete texture */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none" style={NOISE_BG} />
-
-        {/* spray paint glows */}
+        {/* decorative soft circles */}
         <div
-          className="absolute -top-32 -left-52 w-[700px] h-[700px] rounded-full pointer-events-none animate-neon-pulse"
-          style={{ background: "radial-gradient(circle, rgba(255,230,0,0.35) 0%, transparent 65%)", filter: "blur(30px)" }}
+          className="absolute top-10 right-10 w-72 h-72 rounded-full opacity-30 pointer-events-none animate-float"
+          style={{ background: "radial-gradient(circle, #7DD5F5 0%, transparent 70%)" }}
         />
         <div
-          className="absolute -bottom-32 -right-52 w-[600px] h-[600px] rounded-full pointer-events-none animate-neon-pulse-delay"
-          style={{ background: "radial-gradient(circle, rgba(255,45,120,0.3) 0%, transparent 65%)", filter: "blur(30px)" }}
+          className="absolute bottom-20 left-10 w-56 h-56 rounded-full opacity-25 pointer-events-none animate-float-delay"
+          style={{ background: "radial-gradient(circle, #60D4B4 0%, transparent 70%)" }}
         />
         <div
-          className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[300px] rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(ellipse, rgba(0,194,255,0.15) 0%, transparent 70%)", filter: "blur(50px)" }}
+          className="absolute top-1/3 left-1/4 w-40 h-40 rounded-full opacity-20 pointer-events-none"
+          style={{ background: "radial-gradient(circle, #A8E6F5 0%, transparent 70%)" }}
         />
 
-        {/* faded graffiti tags in background */}
-        <span
-          className="font-marker absolute top-24 left-6 text-5xl text-[#FFE600]/10 -rotate-12 select-none pointer-events-none"
-        >
-          #tag
-        </span>
-        <span
-          className="font-marker absolute bottom-28 right-6 text-4xl text-[#FF2D78]/10 rotate-6 select-none pointer-events-none"
-        >
-          street
-        </span>
-        <span
-          className="font-marker absolute top-1/3 right-12 text-3xl text-[#00C2FF]/10 -rotate-6 select-none pointer-events-none"
-        >
-          crew
-        </span>
+        {/* dot grid (maritime) */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-20"
+          style={{
+            backgroundImage: "radial-gradient(circle, #2A9BD5 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
 
-        {/* main content */}
+        {/* content */}
         <div className="relative z-10 text-center px-6">
-          <div className="animate-fadeInUp inline-block mb-8 px-5 py-1 border border-[#FFE600]/30 bg-[#FFE600]/5">
-            <span className="font-bebas text-[#FFE600] text-sm" style={{ letterSpacing: "0.25em" }}>
-              ◉ PORTFOLIO 2025 ◉
-            </span>
+          <div className="animate-fadeInUp inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full bg-white/70 backdrop-blur shadow-sm text-[#2A9BD5] text-sm font-bold">
+            <span>☀️</span>
+            <span>Morning vibes · Portfolio 2025</span>
+            <span>🌊</span>
           </div>
 
-          {/* Name — uses clamp + whitespace-nowrap to prevent wrapping */}
           <h1
-            className="font-marker animate-fadeInUp-delay-1 whitespace-nowrap"
+            className="animate-fadeInUp-delay-1 font-black text-[#0F3D5C] whitespace-nowrap"
             style={{
-              fontSize: "clamp(2.8rem, 9vw, 7.5rem)",
+              fontSize: "clamp(3rem, 9vw, 7.5rem)",
               lineHeight: 1.1,
-              background: "linear-gradient(120deg, #FFE600 0%, #FF2D78 50%, #00C2FF 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              filter: "drop-shadow(0 0 28px rgba(255,230,0,0.45))",
+              textShadow: "0 4px 24px rgba(42,155,213,0.15)",
             }}
           >
             nabecamel
           </h1>
 
           <p
-            className="font-bebas animate-fadeInUp-delay-2 mt-4 mb-10 text-gray-400"
-            style={{ fontSize: "clamp(1rem, 2.8vw, 1.6rem)", letterSpacing: "0.28em" }}
+            className="animate-fadeInUp-delay-2 font-semibold text-[#5AABDF] mt-3 mb-10"
+            style={{ fontSize: "clamp(0.95rem, 2.5vw, 1.35rem)", letterSpacing: "0.06em" }}
           >
-            WEB DEVELOPER &amp; SOFTWARE ENGINEER
+            Web Developer &amp; Software Engineer
           </p>
 
           <div className="animate-fadeInUp-delay-3 flex flex-wrap gap-4 justify-center">
             <a
               href="#contact"
-              className="font-bebas px-8 py-3 bg-[#FFE600] text-[#0d0d0d] hover:-translate-y-1 hover:shadow-[0_0_22px_rgba(255,230,0,0.55)] transition-all duration-200"
-              style={{ letterSpacing: "0.15em" }}
+              className="px-8 py-3.5 rounded-full font-bold text-white bg-[#2A9BD5] hover:bg-[#1E87C1] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#2A9BD5]/30 transition-all duration-200"
             >
-              CONTACT ME
+              お問い合わせ
             </a>
             <a
               href="#projects"
-              className="font-bebas px-8 py-3 border-2 border-[#FFE600] text-[#FFE600] hover:bg-[#FFE600]/10 hover:-translate-y-1 transition-all duration-200"
-              style={{ letterSpacing: "0.15em" }}
+              className="px-8 py-3.5 rounded-full font-bold text-[#38B89A] border-2 border-[#38B89A] bg-white/60 backdrop-blur hover:bg-[#38B89A]/10 hover:-translate-y-0.5 transition-all duration-200"
             >
-              VIEW PROJECTS →
+              作品を見る →
             </a>
           </div>
         </div>
 
         {/* scroll indicator */}
         <div
-          className="font-bebas absolute bottom-10 left-1/2 animate-scroll-bounce flex flex-col items-center gap-2 text-[#FFE600]/35 text-xs"
-          style={{ letterSpacing: "0.22em" }}
+          className="absolute bottom-8 left-1/2 animate-scroll-bounce flex flex-col items-center gap-1.5 text-[#7AAFC0] text-xs font-semibold"
         >
-          SCROLL
+          scroll
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
           </svg>
+        </div>
+
+        {/* bottom wave */}
+        <div className="absolute bottom-0 w-full">
+          <WaveDown fill="#FFFFFF" />
         </div>
       </section>
 
       {/* ── About ── */}
-      <section id="about" className="relative py-28 px-4 bg-[#111111]">
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={NOISE_BG} />
-        <div className="relative max-w-3xl mx-auto">
-          <GrafHeading>ABOUT ME</GrafHeading>
+      <section id="about" className="py-24 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <SectionHeading accent="#2A9BD5">About Me</SectionHeading>
           <AboutBody />
         </div>
       </section>
 
+      {/* wave to tinted */}
+      <div className="bg-white">
+        <WaveDown fill="#EFF9FD" />
+      </div>
+
       {/* ── Projects ── */}
-      <section id="projects" className="relative py-28 px-4 bg-[#0d0d0d]">
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={NOISE_BG} />
-        <div className="relative max-w-5xl mx-auto">
-          <GrafHeading>PROJECTS</GrafHeading>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {PROJECTS.map((p, i) => <ProjectCard key={p.label} project={p} delay={i} />)}
+      <section id="projects" className="py-24 px-4" style={{ background: "#EFF9FD" }}>
+        <div className="max-w-5xl mx-auto">
+          <SectionHeading accent="#38B89A">Projects</SectionHeading>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {PROJECTS.map((p, i) => (
+              <ProjectCard key={p.title} project={p} delay={i} />
+            ))}
           </div>
         </div>
       </section>
 
+      {/* wave back to white */}
+      <div style={{ background: "#EFF9FD" }}>
+        <WaveDown fill="#FFFFFF" />
+      </div>
+
       {/* ── Skills ── */}
-      <section id="skills" className="relative py-28 px-4 bg-[#111111]">
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={NOISE_BG} />
-        <div className="relative max-w-4xl mx-auto">
-          <GrafHeading>SKILLS</GrafHeading>
+      <section id="skills" className="py-24 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <SectionHeading accent="#2A9BD5">Skills</SectionHeading>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {SKILLS.map((g, i) => <SkillGroup key={g.label} group={g} delay={i} />)}
+            {SKILLS.map((g, i) => (
+              <SkillGroup key={g.label} group={g} delay={i} />
+            ))}
           </div>
         </div>
       </section>
 
       {/* ── Contact ── */}
-      <section id="contact" className="relative py-28 px-4 bg-[#0d0d0d]">
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={NOISE_BG} />
-        <div className="relative max-w-3xl mx-auto text-center">
-          <GrafHeading>GET IN TOUCH</GrafHeading>
+      <div className="bg-white">
+        <WaveUp fill="#D6EEFB" />
+      </div>
+      <section
+        id="contact"
+        className="py-24 px-4"
+        style={{ background: "linear-gradient(150deg, #D6EEFB 0%, #E4F7F0 100%)" }}
+      >
+        <div className="max-w-3xl mx-auto text-center">
+          <SectionHeading accent="#2A9BD5">Contact</SectionHeading>
           <ContactCards />
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="bg-[#080808] border-t border-white/5 py-7 text-center">
-        <p
-          className="font-bebas text-gray-600 text-sm"
-          style={{ letterSpacing: "0.2em" }}
-        >
-          © 2025 NABECAMEL. ALL RIGHTS RESERVED.
-        </p>
+      <footer
+        className="py-8 text-center text-sm font-semibold text-[#7AAFC0]"
+        style={{ background: "#D6EEFB" }}
+      >
+        © 2025 nabecamel. All rights reserved.
       </footer>
     </div>
   );
@@ -283,13 +332,19 @@ export default function App() {
 function AboutBody() {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <div ref={ref} className="reveal space-y-5 text-base leading-relaxed text-gray-400">
+    <div ref={ref} className="reveal space-y-5 text-base leading-relaxed text-[#3A6478]">
       <p>
         はじめまして、nabecamelといいます。
         現在は会社でエンジニア研修を受けながら、個人で副業やプロダクト開発に取り組んでいます。
       </p>
-      <div className="pl-5 border-l-[3px] border-[#FFE600] bg-[#FFE600]/5 py-4 pr-4">
-        <p className="text-gray-200">
+      <div
+        className="pl-5 py-4 pr-5 rounded-2xl border-l-4"
+        style={{
+          borderColor: "#2A9BD5",
+          background: "linear-gradient(135deg, #EBF6FD, #F5FCFF)",
+        }}
+      >
+        <p className="text-[#0F3D5C] font-medium">
           初めての副業案件では、Railway上でGPT-4oとPlaywrightを組み合わせたE2Eテスト自動化ツールを開発し、
           SlackやDiscordへの通知を一通り実装しました。実務で使われる構成を自分の手で作れたことは、貴重な経験でした。
         </p>
@@ -302,8 +357,8 @@ function AboutBody() {
         自分の得意なことを押し出すよりも、チームや依頼者の課題を一緒に考えながら動くのが好きです。
         話しやすい雰囲気づくりや、相手の期待を把握することを意識して仕事をしています。
       </p>
-      <p className="text-white font-medium">
-        もし何かお力になれそうなことがあれば、気軽にお声がけください。
+      <p className="font-bold text-[#0F3D5C]">
+        もし何かお力になれそうなことがあれば、気軽にお声がけください ☕
       </p>
     </div>
   );
@@ -318,52 +373,25 @@ function ProjectCard({
   delay: number;
 }) {
   const ref = useReveal<HTMLDivElement>();
-  const [hovered, setHovered] = useState(false);
-
   return (
     <div
       ref={ref}
-      className={`reveal reveal-delay-${delay + 1} bg-[#1a1a1a] border border-white/5 overflow-hidden transition-all duration-300 hover:-translate-y-2`}
-      style={{
-        boxShadow: hovered
-          ? `0 0 0 1px ${project.accent}55, 0 0 30px ${project.accent}22`
-          : "none",
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className={`reveal reveal-delay-${delay + 1} bg-white rounded-3xl overflow-hidden shadow-sm hover:-translate-y-2 hover:shadow-xl transition-all duration-300`}
+      style={{ boxShadow: `0 4px 20px ${project.accent}18` }}
     >
-      {/* header strip */}
-      <div
-        className="px-6 py-3 flex items-center justify-between"
-        style={{ borderBottom: `2px solid ${project.accent}` }}
-      >
-        <span
-          className="font-bebas text-xs"
-          style={{ color: project.accent, letterSpacing: "0.22em" }}
-        >
-          {project.label}
-        </span>
-        <span className="w-2 h-2 rounded-full" style={{ background: project.accent }} />
-      </div>
+      {/* top accent strip */}
+      <div className="h-2 w-full" style={{ background: `linear-gradient(90deg, ${project.accent}, ${project.accent}88)` }} />
 
-      <div className="p-6">
-        <h3
-          className="font-bebas text-2xl text-white mb-3"
-          style={{ letterSpacing: "0.05em" }}
-        >
-          {project.title}
-        </h3>
-        <p className="text-gray-500 text-sm leading-relaxed mb-5">{project.description}</p>
+      <div className="p-7">
+        <div className="text-4xl mb-4">{project.icon}</div>
+        <h3 className="text-xl font-extrabold text-[#0F3D5C] mb-3">{project.title}</h3>
+        <p className="text-[#3A6478] text-sm leading-relaxed mb-5">{project.description}</p>
         <div className="flex flex-wrap gap-2">
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="text-xs px-3 py-0.5 border font-medium"
-              style={{
-                borderColor: `${project.accent}44`,
-                color: project.accent,
-                background: `${project.accent}0d`,
-              }}
+              className="text-xs px-3 py-1 rounded-full font-bold"
+              style={{ background: project.paleBg, color: project.accent }}
             >
               {tag}
             </span>
@@ -374,7 +402,7 @@ function ProjectCard({
   );
 }
 
-// ── Skill group card ─────────────────────────────────────────────────
+// ── Skill group ──────────────────────────────────────────────────────
 function SkillGroup({
   group,
   delay,
@@ -386,24 +414,26 @@ function SkillGroup({
   return (
     <div
       ref={ref}
-      className={`reveal reveal-delay-${delay + 1} bg-[#1a1a1a] border border-white/5 p-6`}
+      className={`reveal reveal-delay-${delay + 1} rounded-3xl p-6`}
+      style={{ background: group.pale, border: `1.5px solid ${group.accent}30` }}
     >
-      <div className="pb-3 mb-5" style={{ borderBottom: `2px solid ${group.color}` }}>
-        <h3
-          className="font-bebas text-xl"
-          style={{ color: group.color, letterSpacing: "0.18em" }}
-        >
-          {group.label}
-        </h3>
-      </div>
-      <ul className="flex flex-col gap-2.5 list-none">
+      <h3
+        className="text-base font-extrabold mb-5"
+        style={{ color: group.accent }}
+      >
+        {group.label}
+      </h3>
+      <div className="flex flex-wrap gap-2">
         {group.items.map((skill) => (
-          <li key={skill} className="flex items-center gap-3 text-sm text-gray-400">
-            <span style={{ color: group.color }} className="text-xs">▶</span>
+          <span
+            key={skill}
+            className="text-xs px-3 py-1.5 rounded-full font-bold bg-white"
+            style={{ color: group.accent, boxShadow: `0 2px 8px ${group.accent}20` }}
+          >
             {skill}
-          </li>
+          </span>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
@@ -413,79 +443,45 @@ function ContactCards() {
   const ref = useReveal<HTMLDivElement>();
   return (
     <div ref={ref} className="reveal">
-      <p className="text-gray-500 mb-12">お仕事のご依頼・ご相談はお気軽にどうぞ。</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <p className="text-[#3A6478] font-semibold mb-10">
+        お仕事のご依頼・ご相談はお気軽にどうぞ。
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {[
           {
-            href:    "mailto:watawata233013@gmail.com",
-            icon:    "📧",
-            accent:  "#FFE600",
-            label:   "EMAIL",
-            value:   "watawata233013@gmail.com",
+            href:     "mailto:watawata233013@gmail.com",
+            icon:     "📧",
+            label:    "Email",
+            value:    "watawata233013@gmail.com",
+            accent:   "#2A9BD5",
             external: false,
           },
           {
-            href:    "https://github.com/nabecamel",
-            icon:    "🐙",
-            accent:  "#FF2D78",
-            label:   "GITHUB",
-            value:   "github.com/nabecamel",
+            href:     "https://github.com/nabecamel",
+            icon:     "🐙",
+            label:    "GitHub",
+            value:    "github.com/nabecamel",
+            accent:   "#38B89A",
             external: true,
           },
-        ].map(({ href, icon, accent, label, value, external }) => (
-          <ContactCard
+        ].map(({ href, icon, label, value, accent, external }) => (
+          <a
             key={label}
             href={href}
-            icon={icon}
-            accent={accent}
-            label={label}
-            value={value}
-            external={external}
-          />
+            {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            className="flex items-center gap-4 bg-white rounded-2xl px-6 py-5 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-200"
+            style={{ boxShadow: `0 4px 16px ${accent}18` }}
+          >
+            <span className="text-3xl">{icon}</span>
+            <div className="text-left">
+              <p className="text-xs font-extrabold mb-0.5" style={{ color: accent }}>
+                {label}
+              </p>
+              <p className="text-[#3A6478] text-sm font-semibold break-all">{value}</p>
+            </div>
+          </a>
         ))}
       </div>
     </div>
-  );
-}
-
-function ContactCard({
-  href,
-  icon,
-  accent,
-  label,
-  value,
-  external,
-}: {
-  href: string;
-  icon: string;
-  accent: string;
-  label: string;
-  value: string;
-  external: boolean;
-}) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <a
-      href={href}
-      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="flex items-center gap-4 bg-[#1a1a1a] border border-white/5 px-7 py-6 transition-all duration-200 hover:-translate-y-1"
-      style={{
-        borderBottom: `2px solid ${accent}`,
-        boxShadow: hovered ? `0 0 22px ${accent}28` : "none",
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <span className="text-3xl">{icon}</span>
-      <div className="text-left">
-        <p
-          className="font-bebas text-xs mb-1"
-          style={{ color: accent, letterSpacing: "0.2em" }}
-        >
-          {label}
-        </p>
-        <p className="text-gray-300 text-sm break-all">{value}</p>
-      </div>
-    </a>
   );
 }

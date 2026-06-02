@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,50 +6,49 @@
 
 @layer base {
   html { scroll-behavior: smooth; }
-  body { font-family: 'Inter', system-ui, sans-serif; background: #0d0d0d; }
+  body {
+    font-family: 'Nunito', system-ui, sans-serif;
+    background: #FAFCFF;
+    color: #0F3D5C;
+  }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(28px); }
+  from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
 }
 
 @keyframes scrollBounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%       { transform: translateX(-50%) translateY(8px); }
+  50%       { transform: translateX(-50%) translateY(7px); }
 }
 
-@keyframes neonPulse {
-  0%, 100% { opacity: 0.25; }
-  50%       { opacity: 0.55; }
-}
-
-@keyframes drip {
-  0%   { height: 0; opacity: 1; }
-  80%  { height: 40px; opacity: 1; }
-  100% { height: 44px; opacity: 0; }
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
 }
 
 @layer utilities {
-  .animate-fadeInUp          { animation: fadeInUp 0.85s ease both; }
-  .animate-fadeInUp-delay-1  { animation: fadeInUp 0.85s 0.15s ease both; }
-  .animate-fadeInUp-delay-2  { animation: fadeInUp 0.85s 0.30s ease both; }
-  .animate-fadeInUp-delay-3  { animation: fadeInUp 0.85s 0.45s ease both; }
-  .animate-neon-pulse        { animation: neonPulse 4s ease-in-out infinite; }
-  .animate-neon-pulse-delay  { animation: neonPulse 4s 1.5s ease-in-out infinite; }
-  .animate-scroll-bounce     { animation: scrollBounce 1.6s ease-in-out infinite; }
+  .animate-fadeInUp          { animation: fadeInUp 0.8s ease both; }
+  .animate-fadeInUp-delay-1  { animation: fadeInUp 0.8s 0.15s ease both; }
+  .animate-fadeInUp-delay-2  { animation: fadeInUp 0.8s 0.30s ease both; }
+  .animate-fadeInUp-delay-3  { animation: fadeInUp 0.8s 0.45s ease both; }
+  .animate-float             { animation: floatY 5s ease-in-out infinite; }
+  .animate-float-delay       { animation: floatY 5s 1.5s ease-in-out infinite; }
+  .animate-scroll-bounce     { animation: scrollBounce 1.8s ease-in-out infinite; }
 
   .reveal {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(22px);
     transition: opacity 0.65s ease, transform 0.65s ease;
   }
   .reveal.visible  { opacity: 1; transform: translateY(0); }
-  .reveal-delay-1  { transition-delay: 0.10s; }
-  .reveal-delay-2  { transition-delay: 0.20s; }
-  .reveal-delay-3  { transition-delay: 0.30s; }
-  .reveal-delay-4  { transition-delay: 0.40s; }
-
-  .font-marker { font-family: 'Permanent Marker', cursive; }
-  .font-bebas  { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.08em; }
+  .reveal-delay-1  { transition-delay: 0.1s; }
+  .reveal-delay-2  { transition-delay: 0.2s; }
+  .reveal-delay-3  { transition-delay: 0.3s; }
 }
